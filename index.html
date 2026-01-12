@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AFK Health and Tracker</title>
+</head>
+    <body>
+        <h1 class="welcome">Welcome to AFK Blood Pressure and Weight Tracker</h1>
+        
+        <h2 class="simple">The Easy to Use Tracker for Monitoring Your Blood Pressure, Weight and Exerscise Routine</h2>
+        
+        <h3 class="measurement-header">Please enter your measurements</h3>
+        
+        <div class="form-container">
+            <label for="date-entry">Date:</label>
+            <input type="date" id="date-entry" name="entry-date">
+
+            <label for="feet">Height:</label>
+            <input type="number" id="feet" name="feet" placeholder="5"> feet
+            <input type="number" id="inches" name="inches" placeholder="10"> inches
+        
+            <label for="weight">Weight</label>
+            <input type="number" id="weight" name="weight"> Lbs
+
+            <label for="blood-pressure">Blood Pressure</label>
+            <input type="text" placeholder="120/80">
+        </div>
+
+        <h3 class="exercise-header">Lets Add Your Workout</h3>
+
+        <div class="exercise-container">
+            <label for="exercise-container">Exercise:</label>
+            <input type="number" id="exercise-reps" name="exercise-reps" placeholder="50">
+        </div>
+
+        <button type="button" id="add-exercise-button">Add Exercise</button>
+
+        <button type="submit">submit</button>
+
+        <div class="bmi-display" style="display: none;">
+            <h3>Your BMI:</h3>
+            <p id="bmi-result"></p>
+        </div>
+
+    </body>
+</html>
