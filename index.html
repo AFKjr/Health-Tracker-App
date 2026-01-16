@@ -37,12 +37,17 @@
                 <option value="push-ups">Push-ups</option>
                 <option value="squats">Squats</option>
                 <option value="running">Running</option>
+                <option value="outdoor-walk">Outdoor Walk</option>
                 <option value="cycling">Indoor Bike Ride</option>
+                <option value="other">Other</option>
             </select>
+            <input type="text" id="custom-exercise" placeholder="Enter exercise name" style="display: none;">
             <input type="number" id="exercise-reps" name="exercise-reps" placeholder="50"> reps
+            
+            <button type="button" id="add-exercise-button">Add Exercise</button>
         </div>
 
-        <button type="button" id="add-exercise-button">Add Exercise</button>
+        
         <button type="submit">submit</button>
 
         <div class="bmi-display" style="display: none;">
