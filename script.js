@@ -1,3 +1,6 @@
+const FEETMEASUREMENT = 12;
+const IMPERIALMEASUREMENT = 703;
+
 //The array that to store exercises
 const exerciseList = [];
 
@@ -6,8 +9,6 @@ const dateEntry = document.getElementById("date-entry");
 
 //Get today's date
 const today = new Date();
-console.log(today);
-console.log(today.getDate());
 
 //Format the date as YYYY-MM-DD
 const year = today.getFullYear();
@@ -15,7 +16,6 @@ const month = String(today.getMonth() + 1).padStart(2, "0");
 const day = String(today.getDate()).padStart(2, "0");
 
 const formattedDate = `${year}-${month}-${day}`;
-console.log(formattedDate);
 
 //Set the input's value
 dateEntry.value = formattedDate;
@@ -63,4 +63,28 @@ function addExercise() {
 
     //TODO: Looking at what is stored until log page is created
     console.log(exerciseList);
+}
+
+const submitButton = document.querySelector('button[type="submit"]');
+submitButton.addEventListener("click", handleSubmit);
+
+function handleSubmit() {
+    //we get the feet and inch values from the user in total inches
+    const userInches = document.getElementById("inches").value;
+    const userFeet = document.getElementById("feet").value;
+    const feetInInches = FEETMEASUREMENT * Number(userFeet);
+    const userWeight = document.getElementById("weight").value;
+    const userTotalHeight = feetInInches + Number(userInches);
+    const BMI = (Number(userWeight) / Math.pow(userTotalHeight, 2)) * IMPERIALMEASUREMENT;
+    const roundedBMI = BMI.toFixed(1);
+
+    const bmiResult = document.getElementById("bmi-result");
+    const bmiDisplayDiv = document.getElementById("bmi-display");
+    bmiResult.textContent = `Your BMI is ${roundedBMI}`;
+    bmiDisplayDiv.style.display = "block";
+
+    const weightResult = document.getElementById("weight-result");
+    const weightDisplayDiv = document.getElementById("weight-display");
+    weightResult.textContent = `Your recorded weight is ${userWeight}`;
+    weightDisplayDiv.style.display = "block";
 }
