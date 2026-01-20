@@ -20,6 +20,15 @@ const formattedDate = `${year}-${month}-${day}`;
 //Set the input's value
 dateEntry.value = formattedDate;
 
+// Loading data setup
+const savedHeight = localStorage.getItem("userHeight");
+
+if (savedHeight) {
+    const heightData = JSON.parse(savedHeight);
+    document.getElementById("feet").value = heightData.feet;
+    document.getElementById("inches").value = heightData.inches;
+}
+
 const exerciseNameSelect = document.getElementById("exercise-name");
 const customExerciseInput = document.getElementById("custom-exercise");
 
@@ -54,6 +63,7 @@ function addExercise() {
     const repsCount = exerciseRepsInput.value;
     
     exerciseList.push({ name: exerciseName, reps: repsCount });
+    alert("Exercise successfully added");
 
     //Clearing inputs for the next exercise
     exerciseNameSelect.value = "";
@@ -87,4 +97,51 @@ function handleSubmit() {
     const weightDisplayDiv = document.getElementById("weight-display");
     weightResult.textContent = `Your recorded weight is ${userWeight}`;
     weightDisplayDiv.style.display = "block";
+
+    const userBloodPressure = document.getElementById("blood-pressure").value;
+    const bpResult = document.getElementById("blood-pressure-result");
+    const bloodPressureDisplayDiv = document.getElementById("blood-pressure-display");
+    bpResult.textContent = `Your blood presure is ${userBloodPressure}`;
+    bloodPressureDisplayDiv.style.display = "block";
+
+    saveEntry(userInches, userFeet, userWeight, userBloodPressure, roundedBMI, exerciseList, formattedDate);
+}
+
+//Function to save entries in localstorage
+function saveEntry(inches, feet, weight, userBloodPressure, bmi, exercises, date) {
+    //First check if height exists in localstorage
+    const savedHeight = localStorage.getItem("userHeight");
+
+    if (!savedHeight) {
+        //Create savedheight then save it
+        const heightData = {
+            feet: feet,
+            inches: inches,
+        };
+        localStorage.setItem("userHeight", JSON.stringify(heightData));
+    }
+    alert("Data saved successfully")
+
+    //Logging entries
+    const logEntry = {
+        date: date,
+        weight: weight,
+        bloodPressure: userBloodPressure,
+        bmi: bmi,
+        exercises: exercises
+    };
+
+    //Get existing entries or create a new one
+    const savedEntries = localStorage.getItem("entries");
+    const entries = savedEntries ? JSON.parse(savedEntries) : [];
+
+    // Add new entry
+    entries.push(logEntry);
+
+    // Save back to localStorage
+    localStorage.setItem("entries", JSON.stringify(entries));
+
+    console.log("Entry saved:", logEntry);
+
+    alert("Data saved successfully");
 }
