@@ -79,31 +79,46 @@ const submitButton = document.querySelector('button[type="submit"]');
 submitButton.addEventListener("click", handleSubmit);
 
 function handleSubmit() {
-    //we get the feet and inch values from the user in total inches
+    // Get the values first from the html
     const userInches = document.getElementById("inches").value;
     const userFeet = document.getElementById("feet").value;
-    const feetInInches = FEETMEASUREMENT * Number(userFeet);
     const userWeight = document.getElementById("weight").value;
+    const userBloodPressure = document.getElementById("blood-pressure").value;
+    
+    // Validate BEFORE doing anything else
+    if (!validateHeight(userFeet, userInches)) {
+        return; // Stop if validation fails
+    }
+    
+    if (!validateWeight(userWeight)) {
+        return; // Stop if validation fails
+    }
+    
+    // NOW we do the calculations
+    const feetInInches = FEETMEASUREMENT * Number(userFeet);
     const userTotalHeight = feetInInches + Number(userInches);
     const BMI = (Number(userWeight) / Math.pow(userTotalHeight, 2)) * IMPERIALMEASUREMENT;
     const roundedBMI = BMI.toFixed(1);
-
+    
+    // Display BMI
     const bmiResult = document.getElementById("bmi-result");
     const bmiDisplayDiv = document.getElementById("bmi-display");
     bmiResult.textContent = `Your BMI is ${roundedBMI}`;
     bmiDisplayDiv.style.display = "block";
-
+    
+    // Display weight
     const weightResult = document.getElementById("weight-result");
     const weightDisplayDiv = document.getElementById("weight-display");
     weightResult.textContent = `Your recorded weight is ${userWeight}`;
     weightDisplayDiv.style.display = "block";
-
-    const userBloodPressure = document.getElementById("blood-pressure").value;
+    
+    // Display blood pressure
     const bpResult = document.getElementById("blood-pressure-result");
     const bloodPressureDisplayDiv = document.getElementById("blood-pressure-display");
-    bpResult.textContent = `Your blood presure is ${userBloodPressure}`;
+    bpResult.textContent = `Your blood pressure is ${userBloodPressure}`;
     bloodPressureDisplayDiv.style.display = "block";
-
+    
+    // Save entry
     saveEntry(userInches, userFeet, userWeight, userBloodPressure, roundedBMI, exerciseList, formattedDate);
 }
 
@@ -144,4 +159,67 @@ function saveEntry(inches, feet, weight, userBloodPressure, bmi, exercises, date
     console.log("Entry saved:", logEntry);
 
     alert("Data saved successfully");
+}
+
+// Input Validation And Sanitization
+function validateHeight(feet, inches) {
+    // Check if empty
+    if (feet === "" || inches === "") {
+        alert("Please enter your height!");
+        return false;
+    }
+
+    // Number Conversion
+    const feetNumb = Number(feet);
+    const inchesNumb = Number(inches);
+
+    // Check if valid numbers
+    if (isNaN(feetNumb) || isNaN(inchesNumb)) {
+        alert("Must enter a valid number!");
+        return false;
+    }
+
+    // The numbers must be positive
+    if (feetNumb < 0 || inchesNumb < 0) {
+        alert("Height must be a positive number");
+        return false;
+    }
+
+    // Checking for resonable ranges
+    if (feetNumb > 8 || inchesNumb >= 12){
+        alert("Your numbers make no sense!");
+        return false;
+    }
+    return true;
+}
+
+// Input validation for weight
+function validateWeight(weight) {
+    // First, check if empty
+    if (weight === "") {
+        alert("Weight must not be empty");
+        return false;
+    }
+
+    // Convert the value to a number(default is string)
+    const weightNum = Number(weight);
+
+    // Check if weight is a valid number up to 300
+    if (isNaN(weightNum)) {
+        alert("Weight must be between 0 and 300");
+        return false;
+    }
+
+    // Check if the value is positive
+    if (weightNum <= 0) {
+        alert("Weight must be positive number");
+        return false;
+    }
+
+    // Check for reasonable weight ranges (50 - 300)
+    if (weightNum < 50 || weightNum > 300) {
+        alert("Please enter a valid weight between 50 and 300");
+        return false;
+    }
+    return true;
 }
