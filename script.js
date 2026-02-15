@@ -1,5 +1,6 @@
 const FEETMEASUREMENT = 12;
 const IMPERIALMEASUREMENT = 703;
+const TIME_BASED_EXERCISES = ["running", "outdoor-walk", "cycling"];
 
 //The array that to store exercises
 const exerciseList = [];
@@ -30,6 +31,7 @@ if (savedHeight) {
 }
 
 const exerciseNameSelect = document.getElementById("exercise-name");
+exerciseNameSelect.addEventListener("change", handleExerciseTypeChange);
 const customExerciseInput = document.getElementById("custom-exercise");
 
 //Handling showing and hiding custom exercise type
@@ -61,6 +63,20 @@ function addExercise() {
         exerciseName = exerciseNameSelect.value;
     }
     const repsCount = exerciseRepsInput.value;
+    const timeCount = document.getElementById("exercise-time").value;
+
+    if (!validateExercise(exerciseNameSelect.value, customExerciseInput.value, repsCount, timeCount)) {
+        return;
+    }
+    
+    // Store either time or reps
+    if (TIME_BASED_EXERCISES.includes(exerciseNameSelect.value)) {
+        exerciseList.push({ name: exerciseName, time: timeCount });
+    } else {
+        exerciseList.push({ name: exerciseName, reps: repsCount });
+    }
+    
+    alert("Exercise successfully added");
     
     exerciseList.push({ name: exerciseName, reps: repsCount });
     alert("Exercise successfully added");
@@ -92,6 +108,10 @@ function handleSubmit() {
     
     if (!validateWeight(userWeight)) {
         return; // Stop if validation fails
+    }
+
+    if (!validateBloodPressure(userBloodPressure)) {
+        return;
     }
     
     // NOW we do the calculations
@@ -222,4 +242,109 @@ function validateWeight(weight) {
         return false;
     }
     return true;
+}
+
+function validateBloodPressure(bp) {
+    // We need to check to see if empty 
+    if (bp === "") {
+        alert("Please enter your blood pressure");
+        return false;
+    }
+
+    // Using regex for formatting
+    const bpPattern = /^\d{2,3}\/\d{2,3}$/;
+    if (!bpPattern.test(bp)) {
+        alert("Blood pressure must be in format XXX/XX (e.g., 120/80")
+        return false;
+    }
+    
+    // Reasonable ranges 
+    const parts = bp.split("/");
+    const systolic = Number(parts[0]);
+    const diastolic = Number(parts[1]);
+
+    if (systolic < 70 || systolic > 250 || diastolic < 40 || diastolic > 150) {
+        alert("Please enter a valid blood pressure reading");
+        return false;
+    }
+    return true;
+}
+
+function validateExercise(exerciseName, customExerciseName, reps, time) {
+    // Check if exercise is selected 
+    if (exerciseName === "") {
+        alert("Please select an exercise from the list");
+        return false;
+    }
+
+    // When "Other" is selected, we check for the custom name
+    if (exerciseName === "other" && customExerciseName === "") {
+        alert("Please enter a custom exercise name");
+        return false;
+    }
+
+    // Check if it's a time-based exercise
+    if (TIME_BASED_EXERCISES.includes(exerciseName)) {
+        // Validate time instead of reps
+        if (time === "") {
+            alert("Please enter time in minutes");
+            return false;
+        }
+        
+        const timeNum = Number(time);
+        if (isNaN(timeNum)) {
+            alert("Time must be a valid number");
+            return false;
+        }
+        
+        if (timeNum <= 0) {
+            alert("Time must be greater than 0");
+            return false;
+        }
+        
+        if (timeNum > 300) {
+            alert("Please enter a reasonable time");
+            return false;
+        }
+    } else {
+        // Validate reps for non-time exercises
+        if (reps === "") {
+            alert("Please enter number of reps");
+            return false;
+        }
+
+        const repsNum = Number(reps);
+        if (isNaN(repsNum)) {
+            alert("Reps must be a valid number");
+            return false;
+        }
+
+        if (repsNum <= 0) {
+            alert("Reps must be greater than 0");
+            return false;
+        }
+
+        if (repsNum > 1000) {
+            alert("Please enter a reasonable number of reps");
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function handleExerciseTypeChange() {
+    const exerciseName = exerciseNameSelect.value;
+    const repsInput = document.getElementById("exercise-reps");
+    const timeInput = document.getElementById("exercise-time");
+
+    if(TIME_BASED_EXERCISES.includes(exerciseName)) {
+        // Then we show time input, and hide reps
+        repsInput.style.display = "none";
+        timeInput.style.display = "inline";
+    } else {
+        // Showing reps input, and hiding time input
+        repsInput.style.display = "inline";
+        timeInput.style.display = "none";
+    }
 }
