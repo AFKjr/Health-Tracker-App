@@ -50,6 +50,9 @@ const addExerciseButton = document.getElementById("add-exercise-button");
 //Click Events
 addExerciseButton.addEventListener("click", addExercise);
 
+const eraseDataButton = document.getElementById("erase-data-button");
+eraseDataButton.addEventListener("click", eraseAllData);
+
 //Adding exercise and custom option to the list
 function addExercise() {
     const exerciseRepsInput = document.getElementById("exercise-reps");
@@ -346,5 +349,21 @@ function handleExerciseTypeChange() {
         // Showing reps input, and hiding time input
         repsInput.style.display = "inline";
         timeInput.style.display = "none";
+    }
+}
+
+function eraseAllData() {
+    // First show the confrimation dialog
+    const confirmed = confirm("Are you sure you want to erase ALL data? This cannot be undone!");
+
+    if (confirmed) {
+        // Clear the localStorage cache 
+        localStorage.clear();
+
+        //Give the user feedback 
+        alert("All data has been erased!");
+
+        // Then reload the page to reset everything
+        location.reload();
     }
 }
