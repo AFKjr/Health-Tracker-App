@@ -1,7 +1,59 @@
+// Create the weight chart
+function createWeightChart(entries) {
+    // Check if there are any entries
+    if (entries.length === 0) {
+        return;
+    }
+    
+    // Extract dates and weights
+    const dates = entries.map(function(entry) {
+        return entry.date;
+    });
+    
+    const weights = entries.map(function(entry) {
+        return Number(entry.weight);
+    });
+    
+    // Canvas element
+    const canvas = document.getElementById("weight-chart");
+    
+    // Create the chart
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Weight (lbs)',
+                data: weights,
+                borderColor: '#000080',
+                backgroundColor: 'rgba(0, 0, 128, 0.2)',
+                borderWidth: 2,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+}
+
 // First load entries from localStorage
 function loadEntries() {
     const savedEntries = localStorage.getItem("entries");
     const entries = savedEntries ? JSON.parse(savedEntries) : [];
+
+    // Create the chart
+    createWeightChart(entries);
 
     const logsContainer = document.getElementById("logs-container");
 

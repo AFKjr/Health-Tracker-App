@@ -6,6 +6,7 @@
     <title>AFK Health Tracker - Logs</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="logs.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <nav class="nav-bar">
@@ -16,6 +17,15 @@
     </nav>
 
     <h1 class="main-heading">Your Health Logs</h1>
+    <h2>Weight Trend</h2>
+    <div class="chart-container">
+        <canvas id="weight-chart"></canvas>
+    </div>
+
+    <h2>Your Entries</h2>
+    <div id="logs-container">
+        <!-- Logs will be displayed  her by javascript-->
+    </div>
     <div id="logs-container">
         <!--Logs dsiplayed here with javascript-->
     </div>
