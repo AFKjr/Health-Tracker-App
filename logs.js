@@ -65,7 +65,7 @@ function loadEntries() {
 
     // Display each entry
     entries.forEach(function(entry) {
-        const entryDiv = document.createElemeent("div");
+        const entryDiv = document.createElement("div");
         entryDiv.classList.add("log-entry");
 
         //Build the entry HTML
@@ -81,18 +81,18 @@ function loadEntries() {
         // Now add exercises
         entry.exercises.forEach(function(exercise) {
             if (exercise.reps) {
-                entryHTML += `<li>${exercise.name}: ${exercise.reps} reps</li`;
+                entryHTML += `<li>${exercise.name}: ${exercise.reps} reps</li>`;
             } else if (exercise.time) {
                 entryHTML += `<li>${exercise.name}: ${exercise.time} minutes</li>`;
             }
         });
 
-        entryHTML += `</ul`;
+        entryHTML += `</ul>`;
 
         entryDiv.innerHTML = entryHTML;
         logsContainer.appendChild(entryDiv);
     });
 }
 
-// Now load entries when the page loads
+// Load in entries
 loadEntries();

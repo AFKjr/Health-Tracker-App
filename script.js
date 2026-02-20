@@ -56,18 +56,18 @@ eraseDataButton.addEventListener("click", eraseAllData);
 //Adding exercise and custom option to the list
 function addExercise() {
     const exerciseRepsInput = document.getElementById("exercise-reps");
-    /*const customExercise = docuemt.querySelector(".custom-exercise");*/
-
+    const exerciseTimeInput = document.getElementById("exercise-time");
+    
     let exerciseName;
-
     if (exerciseNameSelect.value === "other") {
         exerciseName = customExerciseInput.value;
     } else {
         exerciseName = exerciseNameSelect.value;
     }
+    
     const repsCount = exerciseRepsInput.value;
-    const timeCount = document.getElementById("exercise-time").value;
-
+    const timeCount = exerciseTimeInput.value;
+    
     if (!validateExercise(exerciseNameSelect.value, customExerciseInput.value, repsCount, timeCount)) {
         return;
     }
@@ -81,16 +81,13 @@ function addExercise() {
     
     alert("Exercise successfully added");
     
-    exerciseList.push({ name: exerciseName, reps: repsCount });
-    alert("Exercise successfully added");
-
     //Clearing inputs for the next exercise
     exerciseNameSelect.value = "";
     customExerciseInput.value = "";
     customExerciseInput.style.display = "none";
     exerciseRepsInput.value = "";
-
-    //TODO: Looking at what is stored until log page is created
+    exerciseTimeInput.value = "";  
+    
     console.log(exerciseList);
 }
 
