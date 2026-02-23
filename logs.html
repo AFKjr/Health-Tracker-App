@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="logs.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
 </head>
 <body>
     <nav class="nav-bar">
@@ -22,14 +23,22 @@
         <canvas id="weight-chart"></canvas>
     </div>
 
-    <h2>Your Entries</h2>
-    <div id="logs-container">
-        <!-- Logs will be displayed  her by javascript-->
-    </div>
-    <div id="logs-container">
-        <!--Logs dsiplayed here with javascript-->
+    <h2>Blood Pressure Trend</h2>
+    <div class="chart-container">
+        <canvas id="bp-chart"></canvas>
     </div>
 
+    <h2>BMI Trend</h2>
+    <div class="chart-container">
+        <canvas id="bmi-chart"></canvas>
+    </div>
+
+    <h2>Your Entries</h2>
+    <div id="logs-container">
+        <!-- Logs will be displayed here by javascript-->
+    </div>
+
+    <div id="toast" class="toast"></div>
     <script src="logs.js"></script>
     
 </body>

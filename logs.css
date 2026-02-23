@@ -26,3 +26,42 @@
 .log-entry li {
     margin: 5px 0;
 }
+
+.entry-buttons {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.delete-btn {
+    background-color: #c0c0c0;
+    color: #800000;
+    border: 2px outset #808080;
+    font-weight: bold;
+}
+
+.delete-btn:hover {
+    background-color: #d4d0c8;
+}
+
+.edit-form label {
+    display: block;
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+.edit-form input {
+    margin-top: 3px;
+    margin-bottom: 4px;
+    width: 200px;
+}
+
+.remove-exercise-btn {
+    font-size: 11px;
+    padding: 1px 6px;
+    margin-left: 8px;
+    background-color: #c0c0c0;
+    border: 2px outset #808080;
+    color: #800000;
+    cursor: pointer;
+}

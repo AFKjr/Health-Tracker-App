@@ -2,365 +2,308 @@ const FEETMEASUREMENT = 12;
 const IMPERIALMEASUREMENT = 703;
 const TIME_BASED_EXERCISES = ["running", "outdoor-walk", "cycling"];
 
-//The array that to store exercises
+// The array to store exercises for the current session
 const exerciseList = [];
 
-//Code to set the time to the current date 
+// Toast notification
+function showToast(message, type) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.className = "toast show " + (type || "info");
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function() {
+        toast.className = "toast";
+    }, 2500);
+}
+
+// Exercise queue display
+function renderExerciseQueue() {
+    const queueDiv = document.getElementById("exercise-queue");
+    if (exerciseList.length === 0) {
+        queueDiv.innerHTML = '<p class="queue-empty">No exercises added yet.</p>';
+        return;
+    }
+    const items = exerciseList.map(function(ex, i) {
+        const detail = ex.reps ? `${ex.reps} reps` : `${ex.time} min`;
+        return `<li>${ex.name}: ${detail} <button class="remove-queue-btn" onclick="removeFromQueue(${i})">✕</button></li>`;
+    }).join("");
+    queueDiv.innerHTML = `<ul>${items}</ul>`;
+}
+
+function removeFromQueue(index) {
+    exerciseList.splice(index, 1);
+    renderExerciseQueue();
+}
+
+// Set today's date
 const dateEntry = document.getElementById("date-entry");
-
-//Get today's date
 const today = new Date();
-
-//Format the date as YYYY-MM-DD
 const year = today.getFullYear();
 const month = String(today.getMonth() + 1).padStart(2, "0");
 const day = String(today.getDate()).padStart(2, "0");
+dateEntry.value = `${year}-${month}-${day}`;
 
-const formattedDate = `${year}-${month}-${day}`;
-
-//Set the input's value
-dateEntry.value = formattedDate;
-
-// Loading data setup
+// Pre-fill height from saved data
 const savedHeight = localStorage.getItem("userHeight");
-
 if (savedHeight) {
     const heightData = JSON.parse(savedHeight);
     document.getElementById("feet").value = heightData.feet;
     document.getElementById("inches").value = heightData.inches;
 }
 
+// Pre-fill weight and BP from the last saved entry
+const savedEntries = localStorage.getItem("entries");
+if (savedEntries) {
+    const parsedEntries = JSON.parse(savedEntries);
+    if (parsedEntries.length > 0) {
+        const last = parsedEntries[parsedEntries.length - 1];
+        document.getElementById("weight").value = last.weight;
+        document.getElementById("blood-pressure").value = last.bloodPressure;
+    }
+}
+
 const exerciseNameSelect = document.getElementById("exercise-name");
-exerciseNameSelect.addEventListener("change", handleExerciseTypeChange);
 const customExerciseInput = document.getElementById("custom-exercise");
 
-//Handling showing and hiding custom exercise type
-function handleExerciseChange() {
-        if (exerciseNameSelect.value === "other") {
-            customExerciseInput.style.display = "inline";
-        } else {
-            customExerciseInput.style.display = "none";
-        }
-}
 exerciseNameSelect.addEventListener("change", handleExerciseChange);
 
-//Grabbing the exercise button
-const addExerciseButton = document.getElementById("add-exercise-button");
+function handleExerciseChange() {
+    const exerciseName = exerciseNameSelect.value;
+    const repsInput = document.getElementById("exercise-reps");
+    const timeInput = document.getElementById("exercise-time");
 
-//Click Events
+    customExerciseInput.style.display = exerciseName === "other" ? "inline" : "none";
+
+    if (TIME_BASED_EXERCISES.includes(exerciseName)) {
+        repsInput.style.display = "none";
+        timeInput.style.display = "inline";
+    } else {
+        repsInput.style.display = "inline";
+        timeInput.style.display = "none";
+    }
+}
+
+const addExerciseButton = document.getElementById("add-exercise-button");
 addExerciseButton.addEventListener("click", addExercise);
 
 const eraseDataButton = document.getElementById("erase-data-button");
 eraseDataButton.addEventListener("click", eraseAllData);
 
-//Adding exercise and custom option to the list
 function addExercise() {
     const exerciseRepsInput = document.getElementById("exercise-reps");
     const exerciseTimeInput = document.getElementById("exercise-time");
-    
+
     let exerciseName;
     if (exerciseNameSelect.value === "other") {
         exerciseName = customExerciseInput.value;
     } else {
         exerciseName = exerciseNameSelect.value;
     }
-    
+
     const repsCount = exerciseRepsInput.value;
     const timeCount = exerciseTimeInput.value;
-    
+
     if (!validateExercise(exerciseNameSelect.value, customExerciseInput.value, repsCount, timeCount)) {
         return;
     }
-    
-    // Store either time or reps
+
     if (TIME_BASED_EXERCISES.includes(exerciseNameSelect.value)) {
         exerciseList.push({ name: exerciseName, time: timeCount });
     } else {
         exerciseList.push({ name: exerciseName, reps: repsCount });
     }
-    
-    alert("Exercise successfully added");
-    
-    //Clearing inputs for the next exercise
+
+    renderExerciseQueue();
+    showToast("Exercise added!", "success");
+
     exerciseNameSelect.value = "";
     customExerciseInput.value = "";
     customExerciseInput.style.display = "none";
     exerciseRepsInput.value = "";
-    exerciseTimeInput.value = "";  
-    
-    console.log(exerciseList);
+    exerciseTimeInput.value = "";
 }
 
 const submitButton = document.querySelector('button[type="submit"]');
 submitButton.addEventListener("click", handleSubmit);
 
 function handleSubmit() {
-    // Get the values first from the html
     const userInches = document.getElementById("inches").value;
     const userFeet = document.getElementById("feet").value;
     const userWeight = document.getElementById("weight").value;
     const userBloodPressure = document.getElementById("blood-pressure").value;
-    
-    // Validate BEFORE doing anything else
-    if (!validateHeight(userFeet, userInches)) {
-        return; // Stop if validation fails
-    }
-    
-    if (!validateWeight(userWeight)) {
-        return; // Stop if validation fails
-    }
 
-    if (!validateBloodPressure(userBloodPressure)) {
-        return;
-    }
-    
-    // NOW we do the calculations
+    if (!validateHeight(userFeet, userInches)) return;
+    if (!validateWeight(userWeight)) return;
+    if (!validateBloodPressure(userBloodPressure)) return;
+
     const feetInInches = FEETMEASUREMENT * Number(userFeet);
     const userTotalHeight = feetInInches + Number(userInches);
     const BMI = (Number(userWeight) / Math.pow(userTotalHeight, 2)) * IMPERIALMEASUREMENT;
     const roundedBMI = BMI.toFixed(1);
-    
-    // Display BMI
+
     const bmiResult = document.getElementById("bmi-result");
     const bmiDisplayDiv = document.getElementById("bmi-display");
     bmiResult.textContent = `Your BMI is ${roundedBMI}`;
     bmiDisplayDiv.style.display = "block";
-    
-    // Display weight
+
     const weightResult = document.getElementById("weight-result");
     const weightDisplayDiv = document.getElementById("weight-display");
     weightResult.textContent = `Your recorded weight is ${userWeight}`;
     weightDisplayDiv.style.display = "block";
-    
-    // Display blood pressure
+
     const bpResult = document.getElementById("blood-pressure-result");
     const bloodPressureDisplayDiv = document.getElementById("blood-pressure-display");
     bpResult.textContent = `Your blood pressure is ${userBloodPressure}`;
     bloodPressureDisplayDiv.style.display = "block";
-    
-    // Save entry
-    saveEntry(userInches, userFeet, userWeight, userBloodPressure, roundedBMI, exerciseList, formattedDate);
+
+    const entryDate = document.getElementById("date-entry").value;
+    saveEntry(userInches, userFeet, userWeight, userBloodPressure, roundedBMI, exerciseList, entryDate);
 }
 
-//Function to save entries in localstorage
 function saveEntry(inches, feet, weight, userBloodPressure, bmi, exercises, date) {
-    //First check if height exists in localstorage
     const savedHeight = localStorage.getItem("userHeight");
-
     if (!savedHeight) {
-        //Create savedheight then save it
-        const heightData = {
-            feet: feet,
-            inches: inches,
-        };
+        const heightData = { feet: feet, inches: inches };
         localStorage.setItem("userHeight", JSON.stringify(heightData));
     }
-    alert("Data saved successfully")
 
-    //Logging entries
     const logEntry = {
         date: date,
         weight: weight,
         bloodPressure: userBloodPressure,
         bmi: bmi,
-        exercises: exercises
+        exercises: exercises.slice()
     };
 
-    //Get existing entries or create a new one
     const savedEntries = localStorage.getItem("entries");
     const entries = savedEntries ? JSON.parse(savedEntries) : [];
-
-    // Add new entry
     entries.push(logEntry);
-
-    // Save back to localStorage
     localStorage.setItem("entries", JSON.stringify(entries));
 
-    console.log("Entry saved:", logEntry);
+    exerciseList.length = 0;
+    renderExerciseQueue();
 
-    alert("Data saved successfully");
+    showToast("Data saved successfully!", "success");
 }
 
-// Input Validation And Sanitization
+// Input Validation
 function validateHeight(feet, inches) {
-    // Check if empty
     if (feet === "" || inches === "") {
-        alert("Please enter your height!");
+        showToast("Please enter your height!", "error");
         return false;
     }
-
-    // Number Conversion
     const feetNumb = Number(feet);
     const inchesNumb = Number(inches);
-
-    // Check if valid numbers
     if (isNaN(feetNumb) || isNaN(inchesNumb)) {
-        alert("Must enter a valid number!");
+        showToast("Height must be a valid number!", "error");
         return false;
     }
-
-    // The numbers must be positive
     if (feetNumb < 0 || inchesNumb < 0) {
-        alert("Height must be a positive number");
+        showToast("Height must be a positive number.", "error");
         return false;
     }
-
-    // Checking for resonable ranges
-    if (feetNumb > 8 || inchesNumb >= 12){
-        alert("Your numbers make no sense!");
+    if (feetNumb > 8 || inchesNumb >= 12) {
+        showToast("Please enter a realistic height.", "error");
         return false;
     }
     return true;
 }
 
-// Input validation for weight
 function validateWeight(weight) {
-    // First, check if empty
     if (weight === "") {
-        alert("Weight must not be empty");
+        showToast("Please enter your weight.", "error");
         return false;
     }
-
-    // Convert the value to a number(default is string)
     const weightNum = Number(weight);
-
-    // Check if weight is a valid number up to 300
     if (isNaN(weightNum)) {
-        alert("Weight must be between 0 and 300");
+        showToast("Weight must be a valid number.", "error");
         return false;
     }
-
-    // Check if the value is positive
     if (weightNum <= 0) {
-        alert("Weight must be positive number");
+        showToast("Weight must be a positive number.", "error");
         return false;
     }
-
-    // Check for reasonable weight ranges (50 - 300)
     if (weightNum < 50 || weightNum > 300) {
-        alert("Please enter a valid weight between 50 and 300");
+        showToast("Please enter a valid weight between 50 and 300 lbs.", "error");
         return false;
     }
     return true;
 }
 
 function validateBloodPressure(bp) {
-    // We need to check to see if empty 
     if (bp === "") {
-        alert("Please enter your blood pressure");
+        showToast("Please enter your blood pressure.", "error");
         return false;
     }
-
-    // Using regex for formatting
     const bpPattern = /^\d{2,3}\/\d{2,3}$/;
     if (!bpPattern.test(bp)) {
-        alert("Blood pressure must be in format XXX/XX (e.g., 120/80")
+        showToast("Blood pressure must be in format XXX/XX (e.g., 120/80).", "error");
         return false;
     }
-    
-    // Reasonable ranges 
     const parts = bp.split("/");
     const systolic = Number(parts[0]);
     const diastolic = Number(parts[1]);
-
     if (systolic < 70 || systolic > 250 || diastolic < 40 || diastolic > 150) {
-        alert("Please enter a valid blood pressure reading");
+        showToast("Please enter a valid blood pressure reading.", "error");
         return false;
     }
     return true;
 }
 
 function validateExercise(exerciseName, customExerciseName, reps, time) {
-    // Check if exercise is selected 
     if (exerciseName === "") {
-        alert("Please select an exercise from the list");
+        showToast("Please select an exercise from the list.", "error");
         return false;
     }
-
-    // When "Other" is selected, we check for the custom name
     if (exerciseName === "other" && customExerciseName === "") {
-        alert("Please enter a custom exercise name");
+        showToast("Please enter a custom exercise name.", "error");
         return false;
     }
-
-    // Check if it's a time-based exercise
     if (TIME_BASED_EXERCISES.includes(exerciseName)) {
-        // Validate time instead of reps
         if (time === "") {
-            alert("Please enter time in minutes");
+            showToast("Please enter time in minutes.", "error");
             return false;
         }
-        
         const timeNum = Number(time);
         if (isNaN(timeNum)) {
-            alert("Time must be a valid number");
+            showToast("Time must be a valid number.", "error");
             return false;
         }
-        
         if (timeNum <= 0) {
-            alert("Time must be greater than 0");
+            showToast("Time must be greater than 0.", "error");
             return false;
         }
-        
         if (timeNum > 300) {
-            alert("Please enter a reasonable time");
+            showToast("Please enter a reasonable time (max 300 min).", "error");
             return false;
         }
     } else {
-        // Validate reps for non-time exercises
         if (reps === "") {
-            alert("Please enter number of reps");
+            showToast("Please enter number of reps.", "error");
             return false;
         }
-
         const repsNum = Number(reps);
         if (isNaN(repsNum)) {
-            alert("Reps must be a valid number");
+            showToast("Reps must be a valid number.", "error");
             return false;
         }
-
         if (repsNum <= 0) {
-            alert("Reps must be greater than 0");
+            showToast("Reps must be greater than 0.", "error");
             return false;
         }
-
         if (repsNum > 1000) {
-            alert("Please enter a reasonable number of reps");
+            showToast("Please enter a reasonable number of reps (max 1000).", "error");
             return false;
         }
     }
-    
     return true;
 }
 
-function handleExerciseTypeChange() {
-    const exerciseName = exerciseNameSelect.value;
-    const repsInput = document.getElementById("exercise-reps");
-    const timeInput = document.getElementById("exercise-time");
-
-    if(TIME_BASED_EXERCISES.includes(exerciseName)) {
-        // Then we show time input, and hide reps
-        repsInput.style.display = "none";
-        timeInput.style.display = "inline";
-    } else {
-        // Showing reps input, and hiding time input
-        repsInput.style.display = "inline";
-        timeInput.style.display = "none";
-    }
-}
 
 function eraseAllData() {
-    // First show the confrimation dialog
     const confirmed = confirm("Are you sure you want to erase ALL data? This cannot be undone!");
-
     if (confirmed) {
-        // Clear the localStorage cache 
         localStorage.clear();
-
-        //Give the user feedback 
-        alert("All data has been erased!");
-
-        // Then reload the page to reset everything
         location.reload();
     }
 }
