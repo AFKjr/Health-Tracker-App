@@ -254,10 +254,11 @@ function renderEntries(entries) {
         return;
     }
 
-    entries.forEach(function(entry, index) {
+    entries.forEach(function(entry) {
+        const storageIndex = entry._index;
         const entryDiv = document.createElement("div");
         entryDiv.classList.add("log-entry");
-        entryDiv.id = "entry-" + index;
+        entryDiv.id = "entry-" + storageIndex;
 
         entryDiv.innerHTML = `
             <h3>Date: ${entry.date}</h3>
@@ -267,8 +268,8 @@ function renderEntries(entries) {
             <h4>Exercises:</h4>
             <ul>${buildExercisesHTML(entry.exercises)}</ul>
             <div class="entry-buttons">
-                <button onclick="startEdit(${index})">Edit</button>
-                <button class="delete-btn" onclick="deleteEntry(${index})">Delete</button>
+                <button onclick="startEdit(${storageIndex})">Edit</button>
+                <button class="delete-btn" onclick="deleteEntry(${storageIndex})">Delete</button>
             </div>
         `;
 
@@ -377,15 +378,114 @@ function cancelEdit() {
     loadEntries();
 }
 
+// Filter entries by the selected date range
+function getFilteredEntries(entries) {
+    const filterEl = document.getElementById("date-filter");
+    if (!filterEl || filterEl.value === "all") return entries;
+
+    const days = Number(filterEl.value);
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    const cutoffStr = cutoff.toISOString().split("T")[0];
+
+    return entries.filter(function(entry) {
+        return entry.date >= cutoffStr;
+    });
+}
+
+// Export all entries as a CSV file
+function exportCSV() {
+    const entries = JSON.parse(localStorage.getItem("entries") || "[]");
+    if (entries.length === 0) {
+        showToast("No entries to export.", "error");
+        return;
+    }
+
+    const headers = ["Date", "Weight (lbs)", "BMI", "Systolic (mmHg)", "Diastolic (mmHg)", "Exercises"];
+    const rows = entries.map(function(entry) {
+        const bpParts = entry.bloodPressure.split("/");
+        const exercises = (entry.exercises || []).map(function(ex) {
+            return ex.reps ? `${ex.name}: ${ex.reps} reps` : `${ex.name}: ${ex.time} min`;
+        }).join("; ");
+        return [entry.date, entry.weight, entry.bmi, bpParts[0], bpParts[1], `"${exercises}"`].join(",");
+    });
+
+    const csv = [headers.join(",")].concat(rows).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "health-tracker-export.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("CSV exported!", "success");
+}
+
+// Export full localStorage data as a JSON backup file
+function exportJSON() {
+    const data = {
+        entries: JSON.parse(localStorage.getItem("entries") || "[]"),
+        userHeight: JSON.parse(localStorage.getItem("userHeight") || "null")
+    };
+    if (data.entries.length === 0) {
+        showToast("No data to back up.", "error");
+        return;
+    }
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "health-tracker-backup.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("Backup exported!", "success");
+}
+
+// Import a JSON backup file and restore data
+function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!data.entries || !Array.isArray(data.entries)) {
+                showToast("Invalid backup file.", "error");
+                return;
+            }
+            const confirmed = confirm(`Import ${data.entries.length} entries? This will replace your current data.`);
+            if (!confirmed) return;
+
+            localStorage.setItem("entries", JSON.stringify(data.entries));
+            if (data.userHeight) {
+                localStorage.setItem("userHeight", JSON.stringify(data.userHeight));
+            }
+            loadEntries();
+            showToast("Data restored successfully!", "success");
+        } catch (err) {
+            showToast("Failed to read backup file.", "error");
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+}
+
 // Load entries from localStorage and render everything
 function loadEntries() {
     const savedEntries = localStorage.getItem("entries");
-    const entries = savedEntries ? JSON.parse(savedEntries) : [];
+    const allEntries = savedEntries ? JSON.parse(savedEntries) : [];
+
+    // Tag each entry with its original storage index before any filtering or reversing
+    allEntries.forEach(function(entry, i) { entry._index = i; });
+
+    const entries = getFilteredEntries(allEntries);
 
     createWeightChart(entries);
     createBPChart(entries);
     createBMIChart(entries);
-    renderEntries(entries);
+    renderEntries(entries.slice().reverse());
 }
 
 loadEntries();

@@ -18,6 +18,25 @@
     </nav>
 
     <h1 class="main-heading">Your Health Logs</h1>
+
+    <div id="controls">
+        <div class="controls-group">
+            <label for="date-filter">Show:</label>
+            <select id="date-filter" onchange="loadEntries()">
+                <option value="all">All Time</option>
+                <option value="7">Last 7 Days</option>
+                <option value="30">Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+            </select>
+        </div>
+        <div class="controls-group">
+            <button onclick="exportCSV()">Export CSV</button>
+            <button onclick="exportJSON()">Backup Data</button>
+            <label for="import-file" class="file-label">Restore Backup</label>
+            <input type="file" id="import-file" accept=".json" onchange="importJSON(event)" style="display:none;">
+        </div>
+    </div>
+
     <h2>Weight Trend</h2>
     <div class="chart-container">
         <canvas id="weight-chart"></canvas>
@@ -38,7 +57,7 @@
         <!-- Logs will be displayed here by javascript-->
     </div>
 
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast" aria-live="polite"></div>
     <script src="logs.js"></script>
     
 </body>
