@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background with safe zone padding (~10% each side = 51px) -->
+  <rect width="512" height="512" fill="#000080"/>
+  <!-- Heart shape, inset for maskable safe zone -->
+  <path d="M256 390 C256 390 120 295 120 200 C120 155 155 120 198 120 C224 120 246 136 256 155 C266 136 288 120 314 120 C357 120 392 155 392 200 C392 295 256 390 256 390 Z"
+        fill="#c0c0c0" stroke="#808080" stroke-width="6"/>
+  <!-- EKG/pulse line -->
+  <polyline points="100,256 160,256 183,208 206,304 229,188 252,256 268,256 285,224 302,256 412,256"
+            fill="none" stroke="#808080" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
