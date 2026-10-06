@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-"AFK Blood Pressure & Exercise Journal" — a vanilla HTML/CSS/JS Progressive Web App for logging blood pressure, weight, BMI, and exercises. No framework, no bundler, no package.json, no tests, no linter. All data lives in the browser's `localStorage`.
+"AFK Blood Pressure & Exercise Journal" — a vanilla HTML/CSS/JS Progressive Web App for logging blood pressure, weight, BMI, and exercises. No framework, no bundler, no build step, no linter; `package.json` exists only for tests. All data lives in the browser's `localStorage`. Deployed from `main` via GitHub Pages: https://afkjr.github.io/Health-Tracker-App/
 
 ## Running
 
@@ -15,6 +15,20 @@ python -m http.server 8000
 ```
 
 Then open http://localhost:8000/index.html.
+
+## Testing
+
+```
+npm install            # playwright-core only; no browser download
+npm test               # all tests (node:test)
+npm run test:unit      # csv.test.mjs + sw.test.mjs, no browser
+npm run test:browser   # end-to-end in the locally installed Chrome
+node --test --test-name-pattern="bad CSV" tests/browser.test.mjs   # a single test
+```
+
+- `tests/csv.test.mjs` — `js/csv.js` directly in Node (`csv.js`, `health.js`, `validation.js` are DOM-free).
+- `tests/sw.test.mjs` — static check that `ASSETS_TO_CACHE` in `sw.js` lists every file in `js/`, every page/stylesheet/icon, and the same pinned CDN URLs as `logs.html`. Fails when a new module isn't added to the cache list.
+- `tests/browser.test.mjs` — both pages end to end via `tests/helpers/` (a Node static server on a random port, plus Chrome via `channel: "chrome"`; set `CHROME_PATH` to use another Chromium/Edge). Each test gets a fresh browser context with service workers blocked, except the offline test, which needs internet to precache the CDN scripts.
 
 ## Architecture
 
@@ -42,7 +56,6 @@ Both import formats replace all existing data after a `confirm()`:
 - **Escape stored values before putting them in markup.** Use `escapeHTML` (`js/html.js`) in any template literal assigned to `innerHTML`, including attribute values; imported CSV/JSON is untrusted.
 - **Dates are local `YYYY-MM-DD` strings.** Use `toLocalISODate` (`js/dates.js`), never `toISOString()`, which gives the UTC date.- **No inline handlers** (module scope isn't global). Generated buttons carry `data-action` / `data-index` and are handled by one delegated click listener per container (`#logs-container` in `entries-view.js`, `#exercise-queue` in `exercise-queue.js`); static controls are bound with `addEventListener` in the page entry module.
 - Validators in `validation.js` return an error message or `null`; callers decide how to show it (`showToast(msg, "error")`, or `Row N: msg` for CSV). The form, the edit form, and CSV import all share them, so ranges live in one place.
-- `csv.js`, `health.js` and `validation.js` are DOM-free and can be exercised directly in Node (`node --input-type=module -e "import ... from './js/csv.js'"`).
 - User feedback uses toasts; `confirm()` is used only for destructive actions.
 
 ### PWA / service worker
