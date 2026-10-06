@@ -1,4 +1,4 @@
-const CACHE_NAME = 'health-tracker-v5';
+const CACHE_NAME = 'health-tracker-v6';
 
 const ASSETS_TO_CACHE = [
   'index.html',
@@ -22,8 +22,8 @@ const ASSETS_TO_CACHE = [
   'manifest.json',
   'icon.svg',
   'icon-maskable.svg',
-  'https://cdn.jsdelivr.net/npm/chart.js',
-  'https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3'
+  'https://cdn.jsdelivr.net/npm/chart.js@4.5.1',
+  'https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0'
 ];
 
 // Install: cache all static assets

@@ -47,7 +47,7 @@ Both import formats replace all existing data after a `confirm()`:
 
 ### PWA / service worker
 
-`sw.js` is **cache-first** with a precache list (`ASSETS_TO_CACHE`, including the Chart.js CDN URLs). Consequences when editing:
+`sw.js` is **cache-first** with a precache list (`ASSETS_TO_CACHE`, including the Chart.js CDN URLs). The CDN versions are pinned exactly (`chart.js@4.5.1`, `chartjs-plugin-annotation@3.1.0`); to upgrade, change the URL in both `logs.html` and `sw.js` (they must match for offline use). Consequences when editing:
 
 - Bump `CACHE_NAME` (e.g. `health-tracker-v1` → `v2`) whenever any cached asset changes, or installed clients will keep serving stale files.
 - Add any new local file (page, script, stylesheet, icon) to `ASSETS_TO_CACHE`.
