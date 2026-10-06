@@ -1,16 +1,13 @@
 // Entry point for index.html
 import { getEntries, saveEntries, getHeight, setHeight, clearAll } from "./storage.js";
 import { calcBMI } from "./health.js";
+import { toLocalISODate } from "./dates.js";
 import { validateHeight, validateWeight, validateBloodPressure } from "./validation.js";
 import { initExerciseQueue, getQueuedExercises, clearQueue } from "./exercise-queue.js";
 import { showToast } from "./toast.js";
 
 // Set today's date
-const today = new Date();
-const year = today.getFullYear();
-const month = String(today.getMonth() + 1).padStart(2, "0");
-const day = String(today.getDate()).padStart(2, "0");
-document.getElementById("date-entry").value = `${year}-${month}-${day}`;
+document.getElementById("date-entry").value = toLocalISODate(new Date());
 
 // Pre-fill height from saved data
 const savedHeight = getHeight();
@@ -55,9 +52,8 @@ function handleSubmit() {
 }
 
 function saveEntry(inches, feet, weight, userBloodPressure, bmi, exercises, date) {
-    if (!getHeight()) {
-        setHeight({ feet: feet, inches: inches });
-    }
+    // Always store the submitted height so a corrected height is used from now on
+    setHeight({ feet: feet, inches: inches });
 
     const entries = getEntries();
     entries.push({

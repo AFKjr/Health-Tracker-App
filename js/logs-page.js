@@ -1,5 +1,6 @@
 // Entry point for logs.html
 import { getEntries } from "./storage.js";
+import { toLocalISODate } from "./dates.js";
 import { renderCharts } from "./charts.js";
 import { renderEntries, initEntriesView } from "./entries-view.js";
 import { exportCSV, importCSV, exportJSON, importJSON } from "./backup.js";
@@ -12,7 +13,7 @@ function getFilteredEntries(entries) {
     const days = Number(filterEl.value);
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
-    const cutoffStr = cutoff.toISOString().split("T")[0];
+    const cutoffStr = toLocalISODate(cutoff);
 
     return entries.filter(function(entry) {
         return entry.date >= cutoffStr;
@@ -25,6 +26,11 @@ function loadEntries() {
 
     // Tag each entry with its original storage index before any filtering or reversing
     allEntries.forEach(function(entry, i) { entry._index = i; });
+
+    // Show in date order regardless of the order entries were added (stable, so same-day entries keep entry order)
+    allEntries.sort(function(a, b) {
+        return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
+    });
 
     const entries = getFilteredEntries(allEntries);
 

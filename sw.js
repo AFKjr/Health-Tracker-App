@@ -1,4 +1,4 @@
-const CACHE_NAME = 'health-tracker-v4';
+const CACHE_NAME = 'health-tracker-v5';
 
 const ASSETS_TO_CACHE = [
   'index.html',
@@ -11,6 +11,8 @@ const ASSETS_TO_CACHE = [
   'js/validation.js',
   'js/csv.js',
   'js/download.js',
+  'js/dates.js',
+  'js/html.js',
   'js/exercise-queue.js',
   'js/index-page.js',
   'js/charts.js',

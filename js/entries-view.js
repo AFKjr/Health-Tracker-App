@@ -3,6 +3,7 @@ import { getEntries, saveEntries, getHeight } from "./storage.js";
 import { calcBMI } from "./health.js";
 import { validateDate, validateWeight, validateBloodPressure } from "./validation.js";
 import { showToast } from "./toast.js";
+import { escapeHTML } from "./html.js";
 
 // Temporary exercise list while editing an entry
 let editingExercises = [];
@@ -17,9 +18,9 @@ function buildExercisesHTML(exercises) {
     }
     return exercises.map(function(exercise) {
         if (exercise.reps) {
-            return `<li>${exercise.name}: ${exercise.reps} reps</li>`;
+            return `<li>${escapeHTML(exercise.name)}: ${escapeHTML(exercise.reps)} reps</li>`;
         } else if (exercise.time) {
-            return `<li>${exercise.name}: ${exercise.time} minutes</li>`;
+            return `<li>${escapeHTML(exercise.name)}: ${escapeHTML(exercise.time)} minutes</li>`;
         }
         return "";
     }).join("");
@@ -32,7 +33,7 @@ function buildEditExercisesHTML(entryIndex) {
     }
     return editingExercises.map(function(exercise, i) {
         const detail = exercise.reps ? `${exercise.reps} reps` : `${exercise.time} minutes`;
-        return `<li>${exercise.name}: ${detail} <button class="remove-exercise-btn" data-action="remove-exercise" data-index="${entryIndex}" data-exercise="${i}">Remove</button></li>`;
+        return `<li>${escapeHTML(exercise.name)}: ${escapeHTML(detail)} <button class="remove-exercise-btn" data-action="remove-exercise" data-index="${entryIndex}" data-exercise="${i}">Remove</button></li>`;
     }).join("");
 }
 
@@ -53,10 +54,10 @@ export function renderEntries(entries) {
         entryDiv.id = "entry-" + storageIndex;
 
         entryDiv.innerHTML = `
-            <h3>Date: ${entry.date}</h3>
-            <p>Weight: ${entry.weight} lbs</p>
-            <p>Blood Pressure: ${entry.bloodPressure} mmHg</p>
-            <p>BMI: ${entry.bmi}</p>
+            <h3>Date: ${escapeHTML(entry.date)}</h3>
+            <p>Weight: ${escapeHTML(entry.weight)} lbs</p>
+            <p>Blood Pressure: ${escapeHTML(entry.bloodPressure)} mmHg</p>
+            <p>BMI: ${escapeHTML(entry.bmi)}</p>
             <h4>Exercises:</h4>
             <ul>${buildExercisesHTML(entry.exercises)}</ul>
             <div class="entry-buttons">
@@ -91,11 +92,11 @@ function startEdit(index) {
     entryDiv.innerHTML = `
         <div class="edit-form">
             <label>Date:</label>
-            <input type="date" id="edit-date-${index}" value="${entry.date}">
+            <input type="date" id="edit-date-${index}" value="${escapeHTML(entry.date)}">
             <label>Weight (lbs):</label>
-            <input type="number" id="edit-weight-${index}" value="${entry.weight}">
+            <input type="number" id="edit-weight-${index}" value="${escapeHTML(entry.weight)}">
             <label>Blood Pressure:</label>
-            <input type="text" id="edit-bp-${index}" value="${entry.bloodPressure}">
+            <input type="text" id="edit-bp-${index}" value="${escapeHTML(entry.bloodPressure)}">
             <h4>Exercises:</h4>
             <ul id="edit-exercises-list-${index}">${buildEditExercisesHTML(index)}</ul>
             <div class="entry-buttons">

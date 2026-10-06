@@ -30,7 +30,7 @@ Two pages, each loading one native ES module entry point from `js/` (`<script ty
 - `entries` — JSON array, appended in submission order (not sorted by date):
   `{ date: "YYYY-MM-DD", weight: string, bloodPressure: "120/80", bmi: string, exercises: [{ name, reps } | { name, time }] }`
   Numeric fields are stored as strings straight from the inputs. Exercises in `TIME_BASED_EXERCISES` (`running`, `outdoor-walk`, `cycling`) store `time` (minutes); all others store `reps`.
-- `userHeight` — `{ feet, inches }`, written only on the first submit; used to pre-fill the form and to recompute BMI when an entry is edited on the logs page.
+- `userHeight` — `{ feet, inches }`, overwritten on every submit; used to pre-fill the form and to recompute BMI when an entry is edited on the logs page.
 
 Both import formats replace all existing data after a `confirm()`:
 - **JSON backup** — `{ entries, userHeight }`, lossless.
@@ -38,8 +38,9 @@ Both import formats replace all existing data after a `confirm()`:
 
 ### Conventions that matter
 
-- **Entry identity is the array index.** `loadEntries()` tags each entry with `_index` before filtering/reversing; edit/delete use that index against the raw stored array. Preserve this when changing filtering or sorting.
-- **No inline handlers** (module scope isn't global). Generated buttons carry `data-action` / `data-index` and are handled by one delegated click listener per container (`#logs-container` in `entries-view.js`, `#exercise-queue` in `exercise-queue.js`); static controls are bound with `addEventListener` in the page entry module.
+- **Entry identity is the array index.** Storage keeps submission order; `loadEntries()` tags each entry with `_index`, then sorts by date, filters, and reverses for display. Edit/delete use `_index` against the raw stored array, so always tag before reordering.
+- **Escape stored values before putting them in markup.** Use `escapeHTML` (`js/html.js`) in any template literal assigned to `innerHTML`, including attribute values; imported CSV/JSON is untrusted.
+- **Dates are local `YYYY-MM-DD` strings.** Use `toLocalISODate` (`js/dates.js`), never `toISOString()`, which gives the UTC date.- **No inline handlers** (module scope isn't global). Generated buttons carry `data-action` / `data-index` and are handled by one delegated click listener per container (`#logs-container` in `entries-view.js`, `#exercise-queue` in `exercise-queue.js`); static controls are bound with `addEventListener` in the page entry module.
 - Validators in `validation.js` return an error message or `null`; callers decide how to show it (`showToast(msg, "error")`, or `Row N: msg` for CSV). The form, the edit form, and CSV import all share them, so ranges live in one place.
 - `csv.js`, `health.js` and `validation.js` are DOM-free and can be exercised directly in Node (`node --input-type=module -e "import ... from './js/csv.js'"`).
 - User feedback uses toasts; `confirm()` is used only for destructive actions.

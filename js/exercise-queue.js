@@ -2,6 +2,7 @@
 import { TIME_BASED_EXERCISES } from "./health.js";
 import { validateExercise } from "./validation.js";
 import { showToast } from "./toast.js";
+import { escapeHTML } from "./html.js";
 
 // The array to store exercises for the current session
 const exerciseList = [];
@@ -27,7 +28,7 @@ function renderExerciseQueue() {
     }
     const items = exerciseList.map(function(ex, i) {
         const detail = ex.reps ? `${ex.reps} reps` : `${ex.time} min`;
-        return `<li>${ex.name}: ${detail} <button class="remove-queue-btn" data-action="remove-queue" data-index="${i}">✕</button></li>`;
+        return `<li>${escapeHTML(ex.name)}: ${escapeHTML(detail)} <button class="remove-queue-btn" data-action="remove-queue" data-index="${i}">✕</button></li>`;
     }).join("");
     queueDiv.innerHTML = `<ul>${items}</ul>`;
 }
