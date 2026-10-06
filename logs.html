@@ -28,7 +28,7 @@
     <div id="controls">
         <div class="controls-group">
             <label for="date-filter">Show:</label>
-            <select id="date-filter" onchange="loadEntries()">
+            <select id="date-filter">
                 <option value="all">All Time</option>
                 <option value="7">Last 7 Days</option>
                 <option value="30">Last 30 Days</option>
@@ -36,10 +36,12 @@
             </select>
         </div>
         <div class="controls-group">
-            <button onclick="exportCSV()">Export CSV</button>
-            <button onclick="exportJSON()">Backup Data</button>
+            <button id="export-csv-btn">Export CSV</button>
+            <label for="import-csv" class="file-label">Import CSV</label>
+            <input type="file" id="import-csv" accept=".csv" style="display:none;">
+            <button id="export-json-btn">Backup Data</button>
             <label for="import-file" class="file-label">Restore Backup</label>
-            <input type="file" id="import-file" accept=".json" onchange="importJSON(event)" style="display:none;">
+            <input type="file" id="import-file" accept=".json" style="display:none;">
         </div>
     </div>
 
@@ -64,7 +66,7 @@
     </div>
 
     <div id="toast" class="toast" aria-live="polite"></div>
-    <script src="logs.js"></script>
+    <script type="module" src="js/logs-page.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');

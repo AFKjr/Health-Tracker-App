@@ -1,12 +1,22 @@
-const CACHE_NAME = 'health-tracker-v1';
+const CACHE_NAME = 'health-tracker-v2';
 
 const ASSETS_TO_CACHE = [
   'index.html',
   'logs.html',
   'styles.css',
   'logs.css',
-  'script.js',
-  'logs.js',
+  'js/storage.js',
+  'js/toast.js',
+  'js/health.js',
+  'js/validation.js',
+  'js/csv.js',
+  'js/download.js',
+  'js/exercise-queue.js',
+  'js/index-page.js',
+  'js/charts.js',
+  'js/entries-view.js',
+  'js/backup.js',
+  'js/logs-page.js',
   'manifest.json',
   'icon.svg',
   'icon-maskable.svg',
