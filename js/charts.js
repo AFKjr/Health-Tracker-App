@@ -7,13 +7,13 @@ let bmiChartInstance = null;
 
 // Create the weight chart
 function createWeightChart(entries) {
-    if (entries.length === 0) {
-        return;
-    }
-
     if (weightChartInstance) {
         weightChartInstance.destroy();
         weightChartInstance = null;
+    }
+
+    if (entries.length === 0) {
+        return;
     }
 
     const dates = entries.map(function(entry) { return entry.date; });
@@ -43,13 +43,13 @@ function createWeightChart(entries) {
 
 // Create the blood pressure chart
 function createBPChart(entries) {
-    if (entries.length === 0) {
-        return;
-    }
-
     if (bpChartInstance) {
         bpChartInstance.destroy();
         bpChartInstance = null;
+    }
+
+    if (entries.length === 0) {
+        return;
     }
 
     const dates = entries.map(function(entry) { return entry.date; });
@@ -141,13 +141,13 @@ function createBPChart(entries) {
 
 // Create the BMI chart
 function createBMIChart(entries) {
-    if (entries.length === 0) {
-        return;
-    }
-
     if (bmiChartInstance) {
         bmiChartInstance.destroy();
         bmiChartInstance = null;
+    }
+
+    if (entries.length === 0) {
+        return;
     }
 
     const dates = entries.map(function(entry) { return entry.date; });
