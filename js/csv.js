@@ -11,10 +11,15 @@ function escapeField(value) {
     return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
+// Exercises are joined with "; ", so escape "\" and ";" inside names
+function escapeExerciseName(exercise) {
+    return Object.assign({}, exercise, { name: exercise.name.replace(/[\\;]/g, "\\$&") });
+}
+
 export function entriesToCSV(entries) {
     const rows = entries.map(function(entry) {
         const bpParts = entry.bloodPressure.split("/");
-        const exercises = (entry.exercises || []).map(formatExercise).join("; ");
+        const exercises = (entry.exercises || []).map(escapeExerciseName).map(formatExercise).join("; ");
         return [entry.date, entry.weight, entry.bmi, bpParts[0], bpParts[1], exercises].map(escapeField).join(",");
     });
     return [HEADERS.join(",")].concat(rows).join("\n");
@@ -68,9 +73,30 @@ function normalizeHeader(header) {
     return header.replace(/\(.*?\)/g, "").trim().toLowerCase();
 }
 
+// Split on ";" not preceded by "\", unescaping "\;" and "\\".
+// Any other backslash is kept as-is so older exports still read the same.
+function splitExercises(text) {
+    const items = [];
+    let current = "";
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === "\\" && (text[i + 1] === ";" || text[i + 1] === "\\")) {
+            current += text[i + 1];
+            i++;
+        } else if (ch === ";") {
+            items.push(current);
+            current = "";
+        } else {
+            current += ch;
+        }
+    }
+    items.push(current);
+    return items;
+}
+
 function parseExercises(text) {
     const exercises = [];
-    const items = text.split(";").map(function(item) { return item.trim(); }).filter(Boolean);
+    const items = splitExercises(text).map(function(item) { return item.trim(); }).filter(Boolean);
     for (const item of items) {
         const match = EXERCISE_PATTERN.exec(item);
         if (!match || match[1].trim() === "") {

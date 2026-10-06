@@ -34,7 +34,7 @@ Two pages, each loading one native ES module entry point from `js/` (`<script ty
 
 Both import formats replace all existing data after a `confirm()`:
 - **JSON backup** — `{ entries, userHeight }`, lossless.
-- **CSV** — header `Date,Weight (lbs),BMI,Systolic (mmHg),Diastolic (mmHg),Exercises`, RFC 4180 quoting, exercises as `name: 50 reps; name: 30 min`. On import, columns are matched by header name (ignoring case and `(...)`), every row is validated, and one bad row aborts the whole import. A blank BMI is recomputed from `userHeight`. Exercise names containing `;` don't round-trip.
+- **CSV** — header `Date,Weight (lbs),BMI,Systolic (mmHg),Diastolic (mmHg),Exercises`, RFC 4180 quoting, exercises as `name: 50 reps; name: 30 min`. On import, columns are matched by header name (ignoring case and `(...)`), every row is validated, and one bad row aborts the whole import. A blank BMI is recomputed from `userHeight`. Inside exercise names, `;` and `\` are backslash-escaped (`\;`, `\\`); any other backslash is read literally, so older exports still import.
 
 ### Conventions that matter
 
